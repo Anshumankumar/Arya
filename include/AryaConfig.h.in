@@ -1,0 +1,2 @@
+#define Arya_VERSION_MAJOR @Arya_VERSION_MAJOR@
+#define Arya_VERSION_MINOR @Arya_VERSION_MINOR@
