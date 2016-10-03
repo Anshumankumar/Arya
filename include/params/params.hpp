@@ -2,6 +2,7 @@
 #define ARYA_PARAMS_HPP
 
 #include <unordered_map>
+#include <vector>
 #include <string>
 #include <iostream>
 #include <typeinfo>
@@ -10,6 +11,7 @@
 class ParamBase
 {
     friend class Params;   
+    friend class ParamVector;   
     protected:
     std::string t_info;
     virtual void* get()=0;
@@ -23,6 +25,7 @@ template <class T=double>
 class Param: public ParamBase
 {
     friend class Params;   
+    friend class ParamVector;   
     private:
     std::shared_ptr<T> value;
 
@@ -97,6 +100,35 @@ class Params
             //  delete params[key];
         }
         params[key]= param; 
+    }
+};
+
+
+class ParamVector
+{
+    public:
+    std::vector<std::shared_ptr<ParamBase>> pList;
+    ParamVector(){}
+    ParamVector(const ParamVector &p)
+    {
+        for (auto& x: pList)
+        {
+            pList.push_back(x->copy());    
+        } 
+    }
+    
+    template <class T=Params>
+    void add(T value)
+    {
+        std::shared_ptr<ParamBase> param(new Param<T>(value));
+        pList.push_back(param);
+    }
+
+    template <class T=Params>
+    void get(int i)
+    {
+        void *value = pList[i]->get();
+        return *(T*)value;
     }
 };
 
