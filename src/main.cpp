@@ -4,12 +4,13 @@
 #include <vector>
 #include <AryaConfig.h>
 
-class P1:public Process<int,int>
+class P1:public Process<double,double>
 {
     public:
     using Process::Process;
     Output run(const Input &in)
     {
+        std::cout << in << "\n";
         return 2*in;
     }
 };
@@ -21,10 +22,13 @@ int main()
     Params p;
     p.setParam("a1",1);
     p.setParam("a2",2);
-    P1 pb1 = P1("pb1");
-    ProcessBase *pb2 = new P1("pb2",&p);
-    std::cout << pb1.run(4) <<"\n";
-    pb2->params->setParam("a2",3);
-    std::cout << p.get<int>("a2");
+    p.setParam("a3","Anshuman");
+    p.setParam("a4",2.0);
+    p.setParam("a5",true);
+    p.setParam("a6",p);
+    SerialProcess<double> sp("s1");
+    sp.addSubProcess(new P1("pb1"));
+    sp.addSubProcess(new P1("pb2"));
+    std::cout << sp.run(2) <<"\n";
     return 0;
 }

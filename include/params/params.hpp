@@ -21,7 +21,7 @@ class ParamBase
 
 typedef std::unordered_map<std::string,std::shared_ptr<ParamBase>> ParamMap;
 
-template <class T=double>
+template <typename T=double>
 class Param: public ParamBase
 {
     friend class Params;   
@@ -34,7 +34,7 @@ class Param: public ParamBase
         this->value = std::shared_ptr<T>(new  T(value));
         t_info = typeid(T).name();
     }
-
+    
     std::shared_ptr<ParamBase> copy()
     {
         return std::shared_ptr<ParamBase>(new Param<T>(*value));
@@ -61,7 +61,7 @@ class Params
         }
     }
     private:
-    template <class T> void check(std::string key)
+    template <typename T> void check(std::string key)
     {
         if (params.find(key) == params.end())
         {
@@ -78,21 +78,21 @@ class Params
     }
 
     public:
-    template <class T=Params> T* getPtr(std::string key)
+    template <typename T=Params> T* getPtr(std::string key)
     {
         check<T>(key);
         void *value = params[key]->get();
         return (T*)value;
 
     }
-    template <class T=Params> T get(std::string key)
+    template <typename T=Params> T get(std::string key)
     {
         check<T>(key);
         void *value = params[key]->get();
         return *(T*)value;
     }
 
-    template <class  T> void setParam(std::string key, T value)
+    template <typename  T> void setParam(std::string key, T value)
     {
         std::shared_ptr<ParamBase> param(new Param<T>(value));
         if (params.find(key) != params.end())
@@ -117,14 +117,14 @@ class ParamVector
         } 
     }
     
-    template <class T=Params>
+    template <typename T=Params>
     void add(T value)
     {
         std::shared_ptr<ParamBase> param(new Param<T>(value));
         pList.push_back(param);
     }
 
-    template <class T=Params>
+    template <typename T=Params>
     void get(int i)
     {
         void *value = pList[i]->get();
