@@ -7,7 +7,7 @@ configure_file (
   "${PROJECT_SOURCE_DIR}/include/AryaConfig.h.in"
   "${PROJECT_SOURCE_DIR}/include/AryaConfig.h"
 )
-
+add_compile_options(-O3)
 
 include_directories("include")
 

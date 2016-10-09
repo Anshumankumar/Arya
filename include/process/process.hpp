@@ -14,7 +14,7 @@ class ProcessBase
     std::unordered_map<std::string,ProcessPtr> subPsMap;
     std::weak_ptr<ProcessBase>  parent;
     public:
-    virtual void* run(const void *in)=0;
+    virtual std::shared_ptr<const void> run(std::shared_ptr<const void> in)=0;
     std::string name;
     Params* params;
     ProcessBase(std::string name,Params *params=NULL)
@@ -63,12 +63,12 @@ class Process: public ProcessBase
 
     virtual Output run(const Input &in) = 0;
     virtual void runDebug(const Input &in, const Output &out){}
-    void* run(const void *in)
+    std::shared_ptr<const void> run(std::shared_ptr<const void> in)
     {
-
-        Output *out = new Output(this->run(*(Input*)in));
-        if (params->get<bool>("debug")) runDebug(*(Input*)in, *out);
-        return (void*) out;
+        return std::shared_ptr<const void>(new Output(
+                this->run(*std::static_pointer_cast<const Input>(in))));
+     /*   if (params->get<bool>("debug")) runDebug(*(Input*)in, *out);
+        return (void*) out;*/
     }
 };
 
@@ -81,16 +81,17 @@ class SerialProcess: public Process<A,B>
     using  Input = typename Process<A, B>::Input;
     Output run(const Input &in)
     {
-        void *inptr = (void *)&in;
+        auto inptr = std::shared_ptr<const void>(new Input(in));
         for(auto ps:this->subPsList)
         {
 
-            inptr = ps->run(inptr);      
+            auto outptr = ps->run(inptr);      
+            inptr = outptr;
         }
-        return  *(Output*)inptr;
+        return *std::static_pointer_cast<const Output>(inptr);
     }
 };
-
+/*
 template <typename A, typename B=A, typename C=std::vector<B>>
 class ParallelProcess:public Process<A,C>
 {
@@ -129,6 +130,6 @@ class SelectorProcess:public Process<A,B>
         return *(Output*)this->subPsMap[sProcess]->run(&in);
     } 
 };
-
+*/
 
 #endif // ARYA_PROCESS_HPP

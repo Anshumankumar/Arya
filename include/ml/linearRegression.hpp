@@ -1,0 +1,7 @@
+#ifndef ARYA_LINEARREGRESSION_HPP
+#define ARYA_LINEARREGRESSION_HPP
+
+class LinearRegression:Process<>
+{
+}
+#endif //ARYA_LINEARREGRESSION_HPP
