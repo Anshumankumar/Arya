@@ -26,6 +26,7 @@ int main()
     p.setParam("a4",2.0);
     p.setParam("a5",true);
     p.setParam("a6",p);
+    std::cout << p.get<int>("a1") << "\n";
     SerialProcess<double> sp("s1");
     sp.addSubProcess(new P1("pb1"));
     sp.addSubProcess(new P1("pb2"));

@@ -14,7 +14,7 @@ class ParamBase
     friend class ParamVector;   
     protected:
     std::string t_info;
-    virtual void* get()=0;
+    virtual std::shared_ptr<void> get()=0;
     virtual std::shared_ptr<ParamBase> copy()=0;
 };
 
@@ -39,9 +39,9 @@ class Param: public ParamBase
     {
         return std::shared_ptr<ParamBase>(new Param<T>(*value));
     }
-    void* get()
+    std::shared_ptr<void>  get()
     {
-        return (void*) &(*value);
+        return std::static_pointer_cast<void>(value);
     }
 };
 
@@ -60,6 +60,14 @@ class Params
             this->params[x.first] = x.second->copy();
         }
     }
+    Params(Params *p)
+    {
+        for (auto& x: p->params)
+        {
+            this->params[x.first] = x.second->copy();
+        }
+
+    }
     private:
     template <typename T> void check(std::string key)
     {
@@ -70,35 +78,24 @@ class Params
         }
         if (typeid(T).name() != params[key]->t_info)
         {
-            std::cout << "Availbale: "<< typeid(T).name() << " \n";
-            std::cout << "Type Mismatch: Requested: "  << params[key]->t_info << "\n" ;
+            std::cerr << "Availbale: "<< typeid(T).name() << " \n";
+            std::cerr << "Type Mismatch: Requested: "  << params[key]->t_info << "\n" ;
             exit(3);
         }
 
     }
 
     public:
-    template <typename T=Params> T* getPtr(std::string key)
+    template <typename T=Params> T& get(std::string key)
     {
         check<T>(key);
-        void *value = params[key]->get();
-        return (T*)value;
-
-    }
-    template <typename T=Params> T get(std::string key)
-    {
-        check<T>(key);
-        void *value = params[key]->get();
-        return *(T*)value;
+        auto value = params[key]->get();
+        return *std::static_pointer_cast<T>(value);
     }
 
     template <typename  T> void setParam(std::string key, T value)
     {
         std::shared_ptr<ParamBase> param(new Param<T>(value));
-        if (params.find(key) != params.end())
-        {
-            //  delete params[key];
-        }
         params[key]= param; 
     }
 };
@@ -116,16 +113,14 @@ class ParamVector
             pList.push_back(x->copy());    
         } 
     }
-    
-    template <typename T=Params>
-    void add(T value)
+
+    template <typename T=Params> void add(T value)
     {
         std::shared_ptr<ParamBase> param(new Param<T>(value));
         pList.push_back(param);
     }
 
-    template <typename T=Params>
-    void get(int i)
+    template <typename T=Params> void get(int i)
     {
         void *value = pList[i]->get();
         return *(T*)value;

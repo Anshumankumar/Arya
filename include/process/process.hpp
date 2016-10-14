@@ -12,29 +12,18 @@ class ProcessBase
     protected:
     std::vector<ProcessPtr> subPsList;
     std::unordered_map<std::string,ProcessPtr> subPsMap;
-    std::weak_ptr<ProcessBase>  parent;
+    ProcessBase *  parent;
     public:
     virtual std::shared_ptr<const void> run(std::shared_ptr<const void> in)=0;
     std::string name;
-    Params* params;
-    ProcessBase(std::string name,Params *params=NULL)
+    std::shared_ptr<Params> params;
+    ProcessBase(std::string name,std::shared_ptr<Params> params=std::make_shared<Params>(new Params()))
     {
-        this->name = name;
-        if(params==NULL)
-        {
-            this->params = new Params();
-        }
-        else
-        {
-            this->params=params;
-        }
+        this->name=name;
+        this->params=params;
         this->params->setParam("debug",false);
     }
-    ~ProcessBase()
-    {
-        delete this->params;
-    }
-    void setParam(Params* params)
+    void setParam(std::shared_ptr<Params> params)
     {
         this->params = params;
     }
@@ -48,7 +37,7 @@ class ProcessBase
     {
         std::string subPsName = ps->name;
         subPsList.push_back(ps);
-       // ps->parent = std::weak_ptr<ProcessBase>(this);
+        ps->parent = this;
         subPsMap[subPsName] = ps;
     }
 };
@@ -57,7 +46,7 @@ template <typename A, typename B=A>
 class Process: public ProcessBase
 {
     public:
-    using ProcessBase::ProcessBase;
+   using ProcessBase::ProcessBase;
     using Input = A;
     using Output = B;
 

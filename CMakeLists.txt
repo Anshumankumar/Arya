@@ -12,5 +12,6 @@ add_compile_options(-O3)
 include_directories("include")
 
 add_executable(main src/main.cpp)
+add_executable(mlMain src/mlMain.cpp)
 
 
