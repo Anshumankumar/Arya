@@ -1,0 +1,14 @@
+LEXER
+PARSER
+
+LEXER-
+    String
+    Double
+    Int
+    Variable
+    colon
+    tab
+    endline
+    Array
+    Comment
+    LineNo

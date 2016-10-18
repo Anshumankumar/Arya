@@ -1,0 +1,70 @@
+%skeleton "lalr1.cc"
+%debug
+%defines
+
+
+%{
+#include <string>
+#include <iostream>
+#include <string.h>
+%}
+%union {
+     int                         integerVal;
+     char*                 var;
+}
+
+%token <integerVal> INTEGER
+%token STRING
+%token ENDLINE
+%token TAB
+%token <var> VARIABLE
+%token COLON
+%token <doubleVal> DOUBLE
+
+
+
+%locations
+
+%{
+
+#include <FlexLexer.h>
+#include "param.tab.hpp"
+#include <iostream>
+
+int  yylex(yy::parser::semantic_type *arg,  yy::parser::location_type * yylloc);
+yy::parser::semantic_type* yylval;
+static int tabcount=0;
+%}
+%%
+params:param {printf("Got a param");}
+      |  params endline param {printf("PARA\n");} 
+      ;
+
+param: 
+    | tabs VARIABLE COLON value {printf("%d param %s \n", tabcount , $2); } 
+
+value:STRING { printf("str\n");}
+     |DOUBLE {printf("dbl\n");}
+     |INTEGER {printf("int %d \n", yylval->integerVal);}
+     | {printf("params\n");};
+
+tabs: 
+     | tabs TAB {tabcount++; std::cout << tabcount <<"\n"; } ;
+
+endline:ENDLINE {tabcount=0;};
+
+%%
+
+
+int  yylex(yy::parser::semantic_type *arg,  yy::parser::location_type * yylloc) {
+    yylval = arg;
+    static FlexLexer *flexLexer = new yyFlexLexer();
+    return flexLexer->yylex();
+}
+
+
+void yy::parser::error (const location_type& loc, const std::string& msg)
+{
+    std::cerr << "ERROR: "<< loc <<" " << msg << "\n";
+    exit(2); 
+} 
