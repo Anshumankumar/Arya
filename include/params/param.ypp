@@ -9,12 +9,14 @@
 #include <string.h>
 %}
 %union {
-     int                         integerVal;
-     char*                 var;
+     int                    integerVal;
+     std::string *          var;
+     double                 doubleVal;
+     std::string *          stringVal;
 }
 
 %token <integerVal> INTEGER
-%token STRING
+%token <stringVal> STRING
 %token ENDLINE
 %token TAB
 %token <var> VARIABLE
@@ -28,8 +30,10 @@
 %{
 
 #include <FlexLexer.h>
-#include "param.tab.hpp"
 #include <iostream>
+#include "paramConstructor.hpp"
+extern ParamConstructor pc;
+
 
 int  yylex(yy::parser::semantic_type *arg,  yy::parser::location_type * yylloc);
 yy::parser::semantic_type* yylval;
@@ -41,12 +45,11 @@ params:param {printf("Got a param");}
       ;
 
 param: 
-    | tabs VARIABLE COLON value {printf("%d param %s \n", tabcount , $2); } 
+    | tabs VARIABLE COLON STRING {printf("%d param  \n", tabcount ); std::cout << *$2; } 
+    | tabs VARIABLE COLON DOUBLE {printf("%d param  \n", tabcount ); std::cout << *$2; } 
+    | tabs VARIABLE COLON INTEGER {printf("%d param \n", tabcount); pc.add<int>(*$2,$4,tabcount); } 
+    | tabs VARIABLE COLON {printf("%d param  \n", tabcount );Params p; pc.add<Params>(*$2,p,tabcount);   } 
 
-value:STRING { printf("str\n");}
-     |DOUBLE {printf("dbl\n");}
-     |INTEGER {printf("int %d \n", yylval->integerVal);}
-     | {printf("params\n");};
 
 tabs: 
      | tabs TAB {tabcount++; std::cout << tabcount <<"\n"; } ;

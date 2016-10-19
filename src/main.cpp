@@ -1,5 +1,6 @@
 #include <params/params.hpp>
 #include <process/process.hpp>
+#include <params/paramConstructor.hpp>
 #include <iostream>
 #include <vector>
 #include <AryaConfig.h>
@@ -26,10 +27,17 @@ int main()
     p.setParam("a4",2.0);
     p.setParam("a5",true);
     p.setParam("a6",p);
-    std::cout << p.get<int>("a1") << "\n";
+    std::cout << p.getString();
+/*    std::cout << p.get<int>("a1") << "\n";
     SerialProcess<double> sp("s1");
     sp.addSubProcess(new P1("pb1"));
     sp.addSubProcess(new P1("pb2"));
-    std::cout << sp.run(2) <<"\n";
+    std::cout << sp.run(2) <<"\n"; */
+    ParamConstructor pc;
+    pc.add("an",123,0);
+    pc.add("an2",123.0,0);
+    pc.add("p6",*pc.get(),0);
+    pc.add("p2",123.0,1);
+    std::cout << pc.get()->getString();
     return 0;
 }
