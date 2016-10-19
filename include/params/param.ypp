@@ -31,7 +31,7 @@
 
 #include <FlexLexer.h>
 #include <iostream>
-#include "paramConstructor.hpp"
+#include <params/paramConstructor.hpp>
 extern ParamConstructor pc;
 
 

@@ -2,7 +2,7 @@
 #define PARAM_CONSTRUCTOR_HPP
 
 #include <stack>
-#include "params.hpp"
+#include <params/params.hpp>
 class ParamConstructor
 {
     std::stack<Params*> paramStack;

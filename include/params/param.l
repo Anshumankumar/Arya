@@ -7,7 +7,7 @@ TAB                 [ ][ ][ ][ ]
 
 %{
 
-    #include "param.tab.hpp"
+    #include <param.tab.hpp>
     #include <string.h>
     static yy::location loc;
 

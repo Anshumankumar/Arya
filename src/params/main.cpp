@@ -1,6 +1,6 @@
 #include <iostream>
-#include "param.tab.hpp"
-#include "paramConstructor.hpp"
+#include <param.tab.hpp>
+#include <params/paramConstructor.hpp>
 
 ParamConstructor pc;
 int main()
