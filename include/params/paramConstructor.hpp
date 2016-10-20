@@ -13,7 +13,11 @@ class ParamConstructor
         params = new Params;  
         paramStack.push(params);
     }
-    
+    void reset()
+    {
+        delete params;
+        params = new Params;
+    } 
     ~ParamConstructor()
     {
         delete params;

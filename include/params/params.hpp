@@ -9,10 +9,13 @@
 #include <memory>
 #include <sstream>
 
+class ProcessBase;
+
 class ParamBase
 {
     friend class Params;   
     friend class ParamVector;   
+    friend class ProcessBase;   
     protected:
     std::string t_info;
     virtual std::shared_ptr<void> get()=0;
@@ -89,11 +92,22 @@ class Params
     }
 
     public:
+    std::shared_ptr<ParamBase> getParam(std::string key)
+    {
+        if (params.find(key) == params.end()) return nullptr; 
+        else return params[key];
+    }
     template <typename T=Params> T& get(std::string key)
     {
         check<T>(key);
         auto value = params[key]->get();
         return *std::static_pointer_cast<T>(value);
+    }
+
+    template <typename T=Params> std::shared_ptr<T> getPtr(std::string key)
+    {
+        check<T>(key);
+        return std::static_pointer_cast<T>(params[key]->get());
     }
 
     template <typename  T> void setParam(std::string key, T value)
@@ -152,8 +166,9 @@ template <> std::string Param<Params>::getString(int tcount);
 template <typename T> std::string Param<T>::getString(int tcount)
 {
     std::stringstream ss;
-    ss << *value << "\n";
+    ss <<std::showpoint << *value << "\n";
     return ss.str();
 }
 
-#endif //ARYA_PARAM_HPP
+extern Params parseParam(std::string file);
+#endif //ARYA_PARAMS_HPP

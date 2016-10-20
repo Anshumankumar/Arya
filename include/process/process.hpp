@@ -26,6 +26,14 @@ class ProcessBase
     void setParam(std::shared_ptr<Params> params)
     {
         this->params = params;
+        for(auto& ps: subPsList)
+        {
+            std::shared_ptr<ParamBase> ptr = this->params->getParam(ps->name);
+            if (ptr != nullptr && ptr->t_info == typeid(Params).name() )
+            {
+                ps->setParam(this->params->getPtr<Params>(ps->name));
+            }
+        }
     }
 
     void addSubProcess(ProcessBase* ps)

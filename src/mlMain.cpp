@@ -40,6 +40,8 @@ class MlMain:public SerialProcess<std::string,std::string>
 int main()
 {
     MlMain mlMain = MlMain("mlMain");
+    Params p = new Params(parseParam("/home/anshuman/Personal/arya/config/ml.param"));
+    mlMain.setParam(std::make_shared<Params>(p));
     std::cout << mlMain.run("Ansuhman") << "\n";
 }
 #endif 

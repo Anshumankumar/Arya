@@ -1,12 +1,10 @@
 #include <iostream>
-#include <param.tab.hpp>
-#include <params/paramConstructor.hpp>
+#include <fstream>
+#include <params/params.hpp>
 
-ParamConstructor pc;
-int main()
+extern Params parseParam(std::string file);
+int main(int argc, char **argv )
 {
-    yy::parser* p=new yy::parser();
-    p->parse();
-    std::cout << pc.get()->getString();
+    parseParam(argv[1]);
     return 0;
 }   

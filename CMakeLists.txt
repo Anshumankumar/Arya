@@ -8,7 +8,7 @@ set(Arya_VERSION_MAJOR 0)
 set(Arya_VERSION_MINOR 0)
 configure_file (
   "${PROJECT_SOURCE_DIR}/include/AryaConfig.h.in"
-  "${PROJECT_SOURCE_DIR}/include/AryaConfig.h"
+  "${CMAKE_CURRENT_BINARY_DIR}/AryaConfig.h"
 )
 add_compile_options(-O3)
 
@@ -22,8 +22,14 @@ include_directories("include")
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 
-add_executable(main src/main.cpp src/params/params.cpp src/params/paramConstructor.cpp)
+add_library(params SHARED  
+    ${BISON_MyParser_OUTPUTS}
+    ${FLEX_MyScanner_OUTPUTS}
+    src/params/params.cpp src/params/paramConstructor.cpp )
+
+add_executable(main src/main.cpp)
+target_link_libraries(main params)
 add_executable(mlMain src/mlMain.cpp)
-add_executable(parsertest
-  ${BISON_MyParser_OUTPUTS}
-  ${FLEX_MyScanner_OUTPUTS}  src/params/params.cpp src/params/main.cpp src/params/paramConstructor.cpp)
+target_link_libraries(mlMain params)
+add_executable(parsertest src/params/main.cpp)
+target_link_libraries(parsertest params)

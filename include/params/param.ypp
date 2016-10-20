@@ -13,10 +13,12 @@
      std::string *          var;
      double                 doubleVal;
      std::string *          stringVal;
+     std::string *          errorVal;
 }
 
 %token <integerVal> INTEGER
 %token <stringVal> STRING
+%token <errorVal> ERROR
 %token ENDLINE
 %token TAB
 %token <var> VARIABLE
@@ -31,28 +33,40 @@
 
 #include <FlexLexer.h>
 #include <iostream>
+#include <fstream>
 #include <params/paramConstructor.hpp>
-extern ParamConstructor pc;
+#include <params/params.hpp>
 
 
 int  yylex(yy::parser::semantic_type *arg,  yy::parser::location_type * yylloc);
 yy::parser::semantic_type* yylval;
+yy::location *loc;
 static int tabcount=0;
+static int errorEncountered;
+static FlexLexer *flexLexer = new yyFlexLexer();
+static ParamConstructor pc;
 %}
 %%
-params:param {printf("Got a param");}
-      |  params endline param {printf("PARA\n");} 
+
+
+
+params: e param  
+      |  param
+      |  params endline param {if (errorEncountered < 0) yy::parser::error(*loc,"Invalid Tabs");} 
       ;
 
+e: ERROR  {yy::parser::error(*loc,"Unexpected charater" + *$1);}
+  | e ERROR{yy::parser::error(*loc,"Unexpected charater" + *$2);}
+
 param: 
-    | tabs VARIABLE COLON STRING {printf("%d param  \n", tabcount ); std::cout << *$2; } 
-    | tabs VARIABLE COLON DOUBLE {printf("%d param  \n", tabcount ); std::cout << *$2; } 
-    | tabs VARIABLE COLON INTEGER {printf("%d param \n", tabcount); pc.add<int>(*$2,$4,tabcount); } 
-    | tabs VARIABLE COLON {printf("%d param  \n", tabcount );Params p; pc.add<Params>(*$2,p,tabcount);   } 
+    | tabs VARIABLE COLON STRING {errorEncountered = pc.add<std::string>(*$2,*$4,tabcount);  } 
+    | tabs VARIABLE COLON DOUBLE {errorEncountered = pc.add<double>(*$2,$4,tabcount);  } 
+    | tabs VARIABLE COLON INTEGER { errorEncountered = pc.add<int>(*$2,$4,tabcount); } 
+    | tabs VARIABLE COLON { Params p; errorEncountered = pc.add<Params>(*$2,p,tabcount);   } 
 
 
 tabs: 
-     | tabs TAB {tabcount++; std::cout << tabcount <<"\n"; } ;
+     | tabs TAB {tabcount++;} ;
 
 endline:ENDLINE {tabcount=0;};
 
@@ -61,7 +75,7 @@ endline:ENDLINE {tabcount=0;};
 
 int  yylex(yy::parser::semantic_type *arg,  yy::parser::location_type * yylloc) {
     yylval = arg;
-    static FlexLexer *flexLexer = new yyFlexLexer();
+    loc = yylloc;
     return flexLexer->yylex();
 }
 
@@ -69,5 +83,22 @@ int  yylex(yy::parser::semantic_type *arg,  yy::parser::location_type * yylloc) 
 void yy::parser::error (const location_type& loc, const std::string& msg)
 {
     std::cerr << "ERROR: "<< loc <<" " << msg << "\n";
-    exit(2); 
-} 
+}
+
+Params parseParam(std::string file)
+{
+  std::filebuf fb;
+  if (fb.open (file,std::ios::in))
+  {
+    std::istream is(&fb);
+    flexLexer->switch_streams(is,std::cout);
+    yy::parser* p=new yy::parser();
+    p->parse();
+    std::cout << pc.get()->getString();
+    fb.close();
+    return *pc.get();
+  }
+  std::cerr << "File not found " << file<< std::endl;
+  fb.close();
+  exit(2);
+}  
