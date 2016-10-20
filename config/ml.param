@@ -1,0 +1,7 @@
+csvParser:
+    debug:1
+    takla:1.0
+selector:
+    debug:0
+    parse:1
+debug:1
