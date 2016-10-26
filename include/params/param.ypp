@@ -90,11 +90,11 @@ Params parseParam(std::string file)
   std::filebuf fb;
   if (fb.open (file,std::ios::in))
   {
+    pc.reset();
     std::istream is(&fb);
     flexLexer->switch_streams(is,std::cout);
     yy::parser* p=new yy::parser();
     p->parse();
-    std::cout << pc.get()->getString();
     fb.close();
     return *pc.get();
   }

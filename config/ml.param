@@ -1,7 +1,7 @@
 csvParser:
-    debug:1
-    takla:1.0
-selector:
-    debug:0
-    parse:1
-debug:1
+    filename:"/home/anshuman/.columbia/data2.csv"
+    maxToken:14
+lr:
+    maxRow: 1000000
+    alpha: 1.0
+    maxIter: 50

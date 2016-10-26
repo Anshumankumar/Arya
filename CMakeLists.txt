@@ -33,3 +33,6 @@ add_executable(mlMain src/mlMain.cpp)
 target_link_libraries(mlMain params)
 add_executable(parsertest src/params/main.cpp)
 target_link_libraries(parsertest params)
+
+add_executable(lr src/ml/csvParser.cpp  src/ml/indexer.cpp src/ml/logisticRegression.cpp)
+target_link_libraries(lr params)

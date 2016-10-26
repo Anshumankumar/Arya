@@ -11,9 +11,9 @@ class ProcessBase
 {
     protected:
     std::vector<ProcessPtr> subPsList;
-    std::unordered_map<std::string,ProcessPtr> subPsMap;
     ProcessBase *  parent;
     public:
+    std::unordered_map<std::string,ProcessPtr> subPsMap;
     virtual std::shared_ptr<const void> run(std::shared_ptr<const void> in)=0;
     std::string name;
     std::shared_ptr<Params> params;
@@ -25,7 +25,9 @@ class ProcessBase
     }
     void setParam(std::shared_ptr<Params> params)
     {
+        params->addParamNoOverride(this->params);
         this->params = params;
+        preRun();
         for(auto& ps: subPsList)
         {
             std::shared_ptr<ParamBase> ptr = this->params->getParam(ps->name);
@@ -35,7 +37,7 @@ class ProcessBase
             }
         }
     }
-
+    virtual void preRun(){}
     void addSubProcess(ProcessBase* ps)
     {
         /* use only with new class Don't repeat the class*/

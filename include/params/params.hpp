@@ -115,7 +115,7 @@ class Params
         std::shared_ptr<ParamBase> param(new Param<T>(value));
         params[key]= param; 
     }
-
+    
     std::string getString(int tabCount=0)
     {
         std::stringstream ss;
@@ -130,6 +130,23 @@ class Params
         }
         return ss2.str(); 
     }
+
+    void addParamNoOverride(std::shared_ptr<Params> p)
+    {
+        for (auto& x: p->params)
+        {
+            if (params.find(x.first) != params.end()) continue; 
+            this->params[x.first] = x.second->copy();
+        }
+    }
+    void addParam(std::shared_ptr<Params> p)
+    {
+        for (auto& x: p->params)
+        {
+            this->params[x.first] = x.second->copy();
+        }
+    }
+
 };
 
 
