@@ -7,6 +7,8 @@
 class ProcessBase;
 using ProcessPtr = std::shared_ptr<ProcessBase>;
 
+#define PGET this->params->template get
+
 class ProcessBase
 {
     protected:

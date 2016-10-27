@@ -1,7 +1,7 @@
 csvParser:
-    filename:"/home/anshuman/.columbia/data2.csv"
+    filename:"/home/anshuman/.columbia/data4.csv"
     maxToken:14
 lr:
-    maxRow: 1000000
+    maxRow: 10000000
     alpha: 1.0
-    maxIter: 50
+    maxIter: 100

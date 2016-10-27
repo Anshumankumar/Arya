@@ -1,7 +1,7 @@
 #include <ml/csvParser.hpp>
 
 using Row = std::pair< int ,std::vector <int>>; 
-template <> Row* CsvParser<Row>::getNext(int n)
+template <> Row* CsvParser<Row>::getNext(int &n)
 {
     static std::shared_ptr<Indexer> indexer = std::static_pointer_cast<Indexer>(this->subPsMap["indexer"]);
     if (rows!=NULL) delete [] rows;

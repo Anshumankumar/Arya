@@ -4,12 +4,11 @@
 #include <ml/csvParser.hpp>
 #include <cmath>
 
-#define PGET this->params->template get
 
 using Row = std::pair< int ,std::vector <int>>;
 class LogisticRegression:public Process<CsvParser<Row>*,bool>
 {
-    off_t maxRow;
+    int maxRow;
     double alpha;
     public:
     using Process::Process;
@@ -18,7 +17,7 @@ class LogisticRegression:public Process<CsvParser<Row>*,bool>
         return 1/(1+exp(-t));
     }
     
-    double calculateWeight(std::vector<double> &weight ,std::vector<int> &vec, int &label)
+    double calculateCost(std::vector<double> &weight ,std::vector<int> &vec, int &label)
     {
        double sum=0;
        for (auto &value:vec) sum += weight[value];
@@ -33,43 +32,58 @@ class LogisticRegression:public Process<CsvParser<Row>*,bool>
        return sigmoid(sum) -label;
 
     }
-    void printWeight(std::vector<double> &weight ,Row *t)
+    void printCost(std::vector<double> &weight ,Row *t)
     {
         double J =0;
         for (int i=0;i<maxRow;i++)
         {
-            J += calculateWeight(weight,t[i].second, t[i].first);
+            J += calculateCost(weight,t[i].second, t[i].first);
         }
         std::cout << J/maxRow << "\n";
     }
     
     void optimise(std::vector<double> &weight, Row *t, double *error)
     {
+        #pragma omp parallel for
         for (int i=0; i< maxRow; i++)
             error[i] = calculateError(weight,t[i].second, t[i].first); 
-        std::vector<double> weight2(weight.size(),0.0);
-        for (int i=0; i< maxRow; i++)
-            for (auto &value:t[i].second) weight2[value] += error[i]; 
+         
+        std::vector<std::vector<double>> weights(4,std::vector<double>(weight.size(),0.0));
+
+        #pragma omp parallel for
+        for (int j=0; j<4; j++)
+        {
+            for (int i=j*maxRow/4; i< (j+1)*maxRow/4; i++)
+            {
+                for (auto &value:t[i].second)
+                {
+                     weights[j][value] += error[i];
+                
+                }
+            }
+        }
         for (int i=0;i<weight.size();i++)
-            weight[i] -= alpha*weight2[i]/maxRow;
+        {
+            weight[i] -= alpha*(weights[0][i] + weights[1][i] + weights[2][i] + weights[3][i])/maxRow;
+        }
     }
     Output run(const Input &in)
     {
-        maxRow = (off_t)(PGET<int>("maxRow"));
+        maxRow = PGET<int>("maxRow");
         alpha = PGET<double>("alpha");
         int maxIter = PGET<int>("maxIter");
-        
+
         Row* t = in->getNext(maxRow);
         static std::shared_ptr<Indexer> indexer = std::static_pointer_cast<Indexer>(in->subPsMap["indexer"]);
         auto weight = indexer->getWeight();
         double * error = new double[maxRow];
-        printWeight(weight,t); 
+        printCost(weight,t); 
         for (int i=0; i<maxIter; i++)
         {
             optimise(weight,t,error); 
         }
         delete [] error;
-        printWeight(weight,t); 
+        printCost(weight,t); 
         return true;
     }
 

@@ -1,7 +1,8 @@
 #include <ml/indexer.hpp>
 
 Indexer::Indexer(std::string name, int t):items(t),Process(name),currentIndex(0)
-{}
+{
+}
 
 Indexer::Indexer(int t):Indexer("indexer",t){}
 
