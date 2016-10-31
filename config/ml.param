@@ -1,7 +1,20 @@
+maxToken:19
 csvParser:
-    filename:"/home/anshuman/.columbia/data4.csv"
-    maxToken:14
+    filename:"/home/anshuman/.columbia/data10.csv"
+    indexer:"/home/anshuman/Personal/arya/bin/weight"
+    maxToken:19
 lr:
-    maxRow: 10000000
+    maxRow: 1000000
+    alpha: 100.0
+    maxIter: 2
+    classType:"trainer"
+    filename:"/home/anshuman/.columbia/data10.csv"
+    ifile:"/home/anshuman/Personal/arya/bin/weight"
+    ti: 100
+lrt:
+    maxRow: 20000000
     alpha: 1.0
     maxIter: 100
+    classType:"tester"
+    filename:"/home/anshuman/.columbia/data11.csv"
+    ti: 1

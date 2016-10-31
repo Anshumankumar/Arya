@@ -16,6 +16,7 @@ template  <typename T>
 class CsvParser:public Process<std::string, CsvParser<T>*>
 {
     int fp;
+    std::string pfile;
     off_t fileSize;
     char *data;
     off_t ptr;
@@ -27,12 +28,21 @@ class CsvParser:public Process<std::string, CsvParser<T>*>
     
     CsvParser* run(const std::string & in)
     {
+        std::string filename;
+        if (in =="")
+            filename = this->params->template get<std::string>("filename");
+        else 
+            filename = in;
+        if (pfile == filename)
+            return this;
+        pfile = filename;
+        munmap(data,fileSize);
+        close(fp);
         rows = NULL;
         ptr =0;
-        std::string filename = this->params->template get<std::string>("filename");
         maxToken = this->params->template get<int>("maxToken");
         fp = open(filename.c_str(), O_RDONLY);
-        if (fp == -1)
+        if (fp < 0)
         {
             perror(NULL);
             exit(2);
@@ -42,6 +52,10 @@ class CsvParser:public Process<std::string, CsvParser<T>*>
         fileSize = st.st_size;
         data = (char *)mmap(NULL, fileSize, PROT_READ,MAP_SHARED,fp, 0);
         posix_madvise((void *)data,fileSize, POSIX_FADV_SEQUENTIAL);
+        std::string filenameIndex = PGET<std::string>("indexer");
+        static std::shared_ptr<Indexer> indexer = std::static_pointer_cast<Indexer>(PRGET("indexer"));
+        if (filenameIndex!="")
+            indexer->run(filenameIndex);
         return this;
     }
     T * getNext(int &n);

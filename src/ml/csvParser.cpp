@@ -3,7 +3,7 @@
 using Row = std::pair< int ,std::vector <int>>; 
 template <> Row* CsvParser<Row>::getNext(int &n)
 {
-    static std::shared_ptr<Indexer> indexer = std::static_pointer_cast<Indexer>(this->subPsMap["indexer"]);
+    auto indexer = std::static_pointer_cast<Indexer>(PRGET("indexer"));
     if (rows!=NULL) delete [] rows;
     rows = new Row [n];
     off_t clineNo =0;
@@ -24,19 +24,14 @@ template <> Row* CsvParser<Row>::getNext(int &n)
             token =0;
             rows[clineNo++].first = std::stoi(std::string(&data[cptr],ptr-cptr));
             cptr = ptr+1;
-            if (clineNo >= n) break;
+            if (clineNo >= n) {ptr++;break;}
         }
 
         ptr++;
     }
     if (ptr >= fileSize) ptr = 0;
+    n = clineNo;
     return rows;
 
 }
 
-
-template <> void CsvParser<Row>::preRun()
-{
-    int mToken =  this->params->template get<int>("maxToken");
-    addSubProcess(new Indexer("indexer", mToken));
-}

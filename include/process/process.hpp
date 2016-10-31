@@ -8,6 +8,7 @@ class ProcessBase;
 using ProcessPtr = std::shared_ptr<ProcessBase>;
 
 #define PGET this->params->template get
+#define PRGET(X)  this->params->template get<ProcessPtr>(std::string("__PS__")+std::string(X))
 
 class ProcessBase
 {
@@ -24,6 +25,14 @@ class ProcessBase
         this->name=name;
         this->params=params;
         this->params->setParam("debug",false);
+    }
+    void setCommonProcess(ProcessPtr ptr)
+    {
+        this->params->setParam<ProcessPtr>("__PS__"+  ptr->name, ptr);
+        for(auto& ps: subPsList)
+        {
+            ps->setCommonProcess(ptr);
+        }
     }
     void setParam(std::shared_ptr<Params> params)
     {

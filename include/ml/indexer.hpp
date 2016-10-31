@@ -7,6 +7,7 @@ class Indexer:public Process<std::string,bool>
     private:
     int currentIndex;
     std::vector<double> weight;
+    std::vector<double> sumWeight;
     std::vector<std::unordered_map<std::string, int>> items;
     public:
     Indexer(std::string name,int t);
@@ -15,5 +16,6 @@ class Indexer:public Process<std::string,bool>
     int getIndex(int i, std::string str);
     std::vector <double> getWeight();
     void setWeight(std::vector<double> v);
+    void saveIndex(std::string folder);
 };
 #endif
