@@ -43,3 +43,6 @@ target_link_libraries(parsertest params)
 
 add_executable(lr src/ml/csvParser.cpp  src/ml/indexer.cpp src/ml/logisticRegression.cpp)
 target_link_libraries(lr params)
+
+add_executable(neuralNetwork src/ml/neuralNetwork.cpp)
+target_link_libraries(neuralNetwork params)

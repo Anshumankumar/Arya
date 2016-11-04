@@ -1,0 +1,10 @@
+maxToken:19
+neuralNetwork:
+    noOfLayer:4
+    fp:
+        layer0:
+            outputLen:4
+        layer1:
+            outputLen:10
+        layer2:
+            outputLen:1 

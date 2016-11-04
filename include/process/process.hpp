@@ -13,9 +13,9 @@ using ProcessPtr = std::shared_ptr<ProcessBase>;
 class ProcessBase
 {
     protected:
-    std::vector<ProcessPtr> subPsList;
     ProcessBase *  parent;
     public:
+    std::vector<ProcessPtr> subPsList;
     std::unordered_map<std::string,ProcessPtr> subPsMap;
     virtual std::shared_ptr<const void> run(std::shared_ptr<const void> in)=0;
     std::string name;

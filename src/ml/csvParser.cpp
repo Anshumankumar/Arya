@@ -14,7 +14,8 @@ template <> Row* CsvParser<Row>::getNext(int &n)
         if (data[ptr] == ',')
         { 
             if (token <maxToken)
-                rows[clineNo].second.push_back(indexer->getIndex(token,std::string(&data[cptr],ptr-cptr)));
+                rows[clineNo].second.push_back(indexer->getIndex(
+                        token,std::string(&data[cptr],ptr-cptr)));
             token++;
             cptr = ptr+1;
 
@@ -22,6 +23,7 @@ template <> Row* CsvParser<Row>::getNext(int &n)
         else if (data[ptr] == '\n') 
         {
             token =0;
+            rows[clineNo].second.push_back(0);
             rows[clineNo++].first = std::stoi(std::string(&data[cptr],ptr-cptr));
             cptr = ptr+1;
             if (clineNo >= n) {ptr++;break;}
@@ -34,4 +36,3 @@ template <> Row* CsvParser<Row>::getNext(int &n)
     return rows;
 
 }
-

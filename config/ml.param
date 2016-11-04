@@ -5,7 +5,7 @@ csvParser:
     maxToken:19
 lr:
     maxRow: 1000000
-    alpha: 100.0
+    alpha: 60.0
     maxIter: 2
     classType:"trainer"
     filename:"/home/anshuman/.columbia/data10.csv"

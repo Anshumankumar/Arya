@@ -1,3 +1,4 @@
 bin
 include/AryaConfig.h
 *.swp
+tags
