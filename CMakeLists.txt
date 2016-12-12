@@ -4,6 +4,7 @@ project (Arya)
 find_package(BISON)
 find_package(FLEX)
 find_package(OpenMP)
+find_package(GSL)
 
 if (OPENMP_FOUND)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
@@ -41,8 +42,11 @@ target_link_libraries(mlMain params)
 add_executable(parsertest src/params/main.cpp)
 target_link_libraries(parsertest params)
 
-add_executable(lr src/ml/csvParser.cpp  src/ml/indexer.cpp src/ml/logisticRegression.cpp)
-target_link_libraries(lr params)
+#add_executable(lr src/ml/csvParser.cpp  src/ml/indexer.cpp src/ml/logisticRegression.cpp)
+#target_link_libraries(lr params)
 
-add_executable(neuralNetwork src/ml/neuralNetwork.cpp)
+add_executable(neuralNetwork src/ml/neuralNetwork.cpp src/ml/indexer.cpp src/ml/csvParser.cpp)
 target_link_libraries(neuralNetwork params)
+
+add_executable(modelTest src/ml/main.cpp)
+target_link_libraries(modelTest params ${GSL_LIBRARIES})

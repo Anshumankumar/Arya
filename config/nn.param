@@ -1,10 +1,21 @@
 maxToken:19
 neuralNetwork:
-    noOfLayer:4
+    alpha:50.0
+    iterCount:10000
+    maxDataLen:100000
+    csvFile:"/home/anshuman/.columbia/data10.csv"
+    weightFolder:"/home/anshuman/.columbia/weights"
+    noOfLayer:2
     fp:
         layer0:
-            outputLen:4
+            outputLen:1
         layer1:
-            outputLen:10
+            outputLen:5
         layer2:
-            outputLen:1 
+            outputLen:1
+        layer3:
+            outputLen:5
+        layer4:
+            outputLen:1
+        layer5:
+            outputLen:4

@@ -11,9 +11,9 @@
 #include <unistd.h>
 #include <ml/csvParser.hpp>
 #include <ml/indexer.hpp>
-
+#include <ml/utils.hpp>
 template  <typename T>
-class CsvParser:public Process<std::string, CsvParser<T>*>
+class CsvParser:public Process<std::string, bool>
 {
     int fp;
     std::string pfile;
@@ -21,24 +21,19 @@ class CsvParser:public Process<std::string, CsvParser<T>*>
     char *data;
     off_t ptr;
     int maxToken;
-    T* rows;
+    T rows;
     public:
-    using Process<std::string,CsvParser*>::Process;
+    using Process<std::string,bool>::Process;
     virtual void preRun(){}
     
-    CsvParser* run(const std::string & in)
+    bool run(const std::string  &in)
     {
-        std::string filename;
-        if (in =="")
-            filename = this->params->template get<std::string>("filename");
-        else 
-            filename = in;
+        std::string filename = in; 
         if (pfile == filename)
-            return this;
+            return true;
         pfile = filename;
         munmap(data,fileSize);
         close(fp);
-        rows = NULL;
         ptr =0;
         maxToken = this->params->template get<int>("maxToken");
         fp = open(filename.c_str(), O_RDONLY);
@@ -52,17 +47,14 @@ class CsvParser:public Process<std::string, CsvParser<T>*>
         fileSize = st.st_size;
         data = (char *)mmap(NULL, fileSize, PROT_READ,MAP_SHARED,fp, 0);
         posix_madvise((void *)data,fileSize, POSIX_FADV_SEQUENTIAL);
-        std::string filenameIndex = PGET<std::string>("indexer");
         static std::shared_ptr<Indexer> indexer = std::static_pointer_cast<Indexer>(PRGET("indexer"));
-        if (filenameIndex!="")
-            indexer->run(filenameIndex);
-        return this;
+        return true;
     }
-    T * getNext(int &n);
+    T  getNext(int &n);
 
 };
 
-using Row = std::pair< int ,std::vector <int>>;
-template <> Row* CsvParser<Row>::getNext(int &n);
+using Row = std::pair< std::vector<int>,std::vector<Vector>>;
+template <> Row CsvParser<Row>::getNext(int &n);
 
 #endif
