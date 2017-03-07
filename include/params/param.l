@@ -14,7 +14,6 @@ REST                [^{TEXT}]
     extern  yy::location *loc;
 
     extern yy::parser::semantic_type* yylval;
-  // Code run each time a pattern is matched.
   # define YY_USER_ACTION  loc->columns (yyleng);
 %}
 

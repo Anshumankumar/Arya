@@ -13,6 +13,8 @@ class Indexer:public Process<std::string,bool>
     std::uniform_real_distribution<double> distribution;
 
     public:
+    void preRun();
+    int maxIndex;
     Indexer(std::string name,int t);
     Indexer(int t);
     bool run(const std::string &filename);

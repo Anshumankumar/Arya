@@ -17,6 +17,9 @@ class ParamConstructor
     {
         delete params;
         params = new Params;
+        while(!paramStack.empty()) paramStack.pop();
+        paramStack.push(params);
+        
     } 
     ~ParamConstructor()
     {

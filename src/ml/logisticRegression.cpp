@@ -2,7 +2,15 @@
 #define ARYA_LOGISTIC_REGRESSION_HPP
 
 #include <ml/csvParser.hpp>
+#include <ml/model.hpp>
 #include <cmath>
+
+
+class LogisticRegression:public Process<Model*, Model *>
+{
+    calculateCost();
+     
+}
 
 
 using Row = std::pair< int ,std::vector <int>>;

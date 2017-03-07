@@ -8,6 +8,10 @@ Indexer::Indexer(std::string name, int t):items(t),Process(name),distribution(-0
 
 Indexer::Indexer(int t):Indexer("indexer",t){}
 
+void Indexer::preRun()
+{
+    maxIndex = PGET<int>("maxIndex");
+}
 bool Indexer::run(const std::string &folder)
 {
     std::ifstream file;
@@ -16,31 +20,7 @@ bool Indexer::run(const std::string &folder)
         weights.resize(0);
         weights.push_back(0);
     }
-   /* file.open(folder +"/weightMat");
-    while (file.good())
-    {
-        double a; 
-        file >> a;
-        weightMat.push_back(a);
-    } 
-    if (weightMat.size()==0) weight.push_back(0);
-    currentIndex = weightMat.size();
-    file.close();
-    for (int i=0; i<items.size();i++)
-    {
-        sumWeight[i] = 0;
-        file.open(folder +"/"+ std::to_string(i) +  ".weightMat");
-        std::string value;
-        int index; 
-        while (file.good())
-        { 
-            file >> value >> index;
-            items[i][value] = index;
-            sumWeight[i] += weightMat[index];
-        } 
-        file.close();
-    }*/
- }
+}
 
 int Indexer::getIndex(int i, std::string str)
 {
@@ -57,20 +37,9 @@ int Indexer::getIndex(int i, std::string str)
             return items[i][str];
         }
         items[i][str] = currentIndex;
-     
-        if (currentIndex+1 > (*weightMat)[0].size())
-        {
-            for (auto &weights:(*weightMat))
-            {
-                weights.push_back(distribution(generator));
-            }
-        }
- 
-     //   weightMat.push_back(sumWeight[i]/items[i].size());
-     //   sumWeight[i] += weightMat[currentIndex];
         currentIndex++;
     }
-    return items[i][str];
+    return items[i][str]%maxIndex;
 }
 
 

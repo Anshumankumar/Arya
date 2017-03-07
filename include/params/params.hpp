@@ -84,7 +84,7 @@ class Params
         }
         if (typeid(T).name() != params[key]->t_info)
         {
-            std::cerr << "Availbale: "<< typeid(T).name() << " \n";
+            std::cerr << "Available: "<< typeid(T).name() << " \n";
             std::cerr << "Type Mismatch: Requested: "  << params[key]->t_info << "\n" ;
             exit(3);
         }

@@ -48,5 +48,5 @@ target_link_libraries(parsertest params)
 add_executable(neuralNetwork src/ml/neuralNetwork.cpp src/ml/indexer.cpp src/ml/csvParser.cpp)
 target_link_libraries(neuralNetwork params)
 
-add_executable(modelTest src/ml/main.cpp)
-target_link_libraries(modelTest params ${GSL_LIBRARIES})
+add_executable(modelTest src/ml/main.cpp src/ml/indexer.cpp)
+target_link_libraries(modelTest params ${GSL_LIBRARIES} ${GSL_CLBAS_LIBRARY} )

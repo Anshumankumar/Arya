@@ -11,6 +11,8 @@
 #include <cstring>
 #include <gsl/gsl_block.h>
 #include <gsl/gsl_matrix.h>
+#include <gsl/gsl_vector.h>
+#include <gsl/gsl_blas.h>
 #include <process/process.hpp>
 #include <algorithm>
 #include <params/params.hpp>
@@ -32,7 +34,6 @@ class Model
         noOfLayer = param.get<int>("noOfLayer");    
         matrices.resize(noOfLayer);
         std::for_each(matrices.begin(), matrices.end(), [&](gsl_matrix &a){
-            a.block = this->block;
             a.owner = false;
                 
         });
@@ -41,26 +42,11 @@ class Model
         {
             matrices[i].size1 = param.get<int>("s1_" + std::to_string(i)); 
             matrices[i].size2 = param.get<int>("s2_" + std::to_string(i)); 
-            matrices[i].size2 = param.get<int>("s2_" + std::to_string(i)); 
+            matrices[i].tda = param.get<int>("s2_" + std::to_string(i)); 
             size += matrices[i].size1 *matrices[i].size2;
         }
         block = gsl_block_alloc(size);
         size=0;
-        for (int i=0; i<noOfLayer; i++)
-        { 
-            matrices[i].data = &(block->data[size]); 
-            size += matrices[i].size1 *matrices[i].size2;
-        }
-    }
-
-    Model(const Model &model)
-    {
-        owner = true;
-        params = model.params;
-        this->block = gsl_block_alloc(model.block->size);
-        memcpy(this->block->data, model.block->data, model.block->size);
-        matrices = model.matrices;
-        int size=0;
         for (int i=0; i<noOfLayer; i++)
         { 
             matrices[i].block = this->block;
@@ -69,11 +55,42 @@ class Model
         }
     }
 
+    Model  (const Model &model)
+    {
+        owner = false;
+        params = model.params;
+        this->block = model.block;
+        matrices = model.matrices;
+        noOfLayer = model.noOfLayer;
+    }
+
+    Model* copy ()
+    {
+        Model *model = new Model(this->params);
+    
+        memcpy(model->block->data, this->block->data, this->block->size*sizeof(double));
+    
+        return model;
+    }
+
+    void copyTo (Model *tmodel)
+    {
+        memcpy(tmodel->block->data, this->block->data, this->block->size*sizeof(double));
+    
+    }
+
     Model (std::string dir):Model(parseParam(dir+"/model.param"))
     {
         FILE* stream =fopen((dir+"/data").c_str(), "r");
-        gsl_block_fread(stream,this->block);
-        fclose(stream); 
+        if (stream)
+        {
+            gsl_block_fread(stream,this->block);
+            fclose(stream); 
+        }
+        else
+        {   
+            randomIntialize();
+        }
     }
 
     void saveModel(std::string dir)
@@ -91,6 +108,13 @@ class Model
         if (owner == true) gsl_block_free(block);
     }
 
+    void reset()
+    {
+        for (int i=0; i< block->size;i++)
+        {
+            block->data[i] = 0;        
+        }
+    }
     void randomIntialize()
     {
         std::default_random_engine generator;
@@ -108,7 +132,25 @@ class Model
     {
         gsl_matrix_set(&matrices[lno],i,j,x);
     }
+    
+    void updateModel(double alpha, Model *model)
+    {
+        gsl_vector vec1; 
+        gsl_vector vec2;
+        vec1.block = block;
+        vec1.data = block->data;
+        vec1.size = block->size; 
+        vec1.stride  = 1;
+        vec2 = vec1;
+        vec2.block = model->block;
+        vec2.data = model->block->data; 
+        gsl_blas_daxpy(-alpha,&vec2, &vec1); 
+    }
 
+    gsl_matrix* getMatrix(int lno)
+    {
+       return &matrices[lno];
+    }    
 };
 
 #endif //ARYA_MODEL_HPP
